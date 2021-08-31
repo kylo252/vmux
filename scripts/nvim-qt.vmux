@@ -1,2 +1,0 @@
-#!/bin/sh
-VMUX_EDITOR=nvim-qt VMUX_GLOBAL=1 exec vmux "$@"

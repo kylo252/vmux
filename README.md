@@ -1,5 +1,5 @@
-# [vmux](http://github.com/jceb/vmux)
-vim/neovim/kakoune session handler within tmux
+# [vmux](http://github.com/kylo252/vmux)
+neovim session handler within tmux
 
 # Demo
 
@@ -9,23 +9,27 @@ vim/neovim/kakoune session handler within tmux
 
 * Each `tmux` session has its own editor session
 * One global editor session can be started
-* Suports [gvim, vim](http://vim.org/), [neovim](http://neovim.org/) and [kakoune](http://kakoune.org/)
-* Seamless integration with `gvim`, `vim`, `nvim`, `kak` through wrapper scripts
+* Supports [neovim](http://neovim.org/) 
+* Seamless integration with `nvim` through wrapper scripts
   that directly call `vmux` - keep your muscle's memory :-)
 * Once a session has been started in one editor, e.g. `nvim`, the session will
-  be reused even if another editor is called, e.g. `vim` or `kak`
+  be reused even if another editor is called.
 * A new session is started if the old session doesn't exist anymore
 * Automatically select tmux pane running the local or global vim session
 
 # Installation
 
-Python3 is required as well as `tmux` and `vim`, `gvim` or `nvim`.
+Python3 is required as well as `tmux` and `nvim`.
 
 ## Via PyPI
 
 Install `vmux` using `pip`:
 
-    $ pip install vmux
+  ```shell
+  pip install --user vmux
+  # or 
+  pipx install vmux
+  ```
 
 ## From Source
 
@@ -43,7 +47,7 @@ Clone the repository and install vmux:
 
 # Usage
 
-Start editor session through `vmux` or `vim.vmux`, `nvim.vmux` and `gvim.vmux`
+Start editor session through `vmux` 
 wrapper scripts:
 
     tmux
@@ -65,10 +69,8 @@ Define default editor:
 Define path to the real editor executables.  This is required if the wrapper
 scripts are used that will hide the real editors in `$PATH`.
 
-    export VMUX_REALEDITOR_VIM=/usr/bin/vim
     export VMUX_REALEDITOR_NVIM=/usr/bin/nvim
-    export VMUX_REALEDITOR_GVIM=/usr/bin/gvim
-    export VMUX_REALEDITOR_KAK=/usr/bin/kak
+
 
 Define that a global session should be started.  One global and multiple local
 sessions can exists next to one another:

@@ -4,11 +4,11 @@ from setuptools import setup
 
 setup(
     name="vmux",
-    description="vim/neovim/kakoune session handler within tmux",
+    description="neovim session handler within tmux",
     long_description=open('README.md', 'rt').read().strip(),
     long_description_content_type='text/markdown',
     author="Jan Christoph Ebersbach", author_email='jceb@e-jc.de',
-    url="https://github.com/jceb/vmux",
+    url="https://github.com/kylo252/vmux",
     license='GPLv3',
     packages=['vmux'],
     install_requires=[

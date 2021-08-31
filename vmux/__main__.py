@@ -91,61 +91,6 @@ class Editor(object):
         pass
 
 
-class Vim(Editor):
-    cmd = 'vim'
-    cli = True
-
-    def __init__(self, vmux):
-        Editor.__init__(self, vmux)
-
-    @property
-    def session_exists(self):
-        if not self._vmux.session_exists:
-            return False
-        if os.path.exists(self.realdeditor):
-            try:
-                for server in subprocess.check_output(
-                    [self.realdeditor,
-                    '--serverlist'], stderr=subprocess.PIPE).decode('utf-8').strip().split(os.linesep):
-                    if server.upper() == self._vmux.session.upper():
-                        return True
-            except subprocess.CalledProcessError:
-                if DEBUG:
-                    import traceback
-                    traceback.print_exc()
-        return False
-
-    def open(self, args):
-        stripped_sep = False
-        if args[0] == '--':
-            args.pop(0)
-            stripped_sep = True
-        if args and not stripped_sep and args[0].startswith('-'):
-            return subprocess.call(
-                [self.realdeditor, '--servername',
-                 self._vmux.session.upper()] + args)
-        else:
-            return subprocess.call([
-                self.realdeditor, '--servername',
-                self._vmux.session.upper(), '--remote-silent'
-            ] + args)
-
-    def new(self, args, new_session=True):
-        cmd = [self.realdeditor]
-        if new_session:
-            self._vmux.new_session(self.cli)
-            cmd += ['--servername', self._vmux.session]
-        os.execvp(self.realdeditor, cmd + args)
-
-
-class Gvim(Vim):
-    cmd = 'gvim'
-    cli = False
-
-    def __init__(self, vmux):
-        Vim.__init__(self, vmux)
-
-
 class Neovim(Editor):
     cmd = 'nvim'
     cli = True
@@ -216,7 +161,7 @@ class Neovim(Editor):
         nvim.feedkeys(nvim.replace_termcodes('<Esc>'))
 
         for filename in reversed(filenames):
-            nvim.command('e %s' % filename)
+            nvim.command('tabedit %s' % filename)
 
         for command in commands:
             nvim.command(command)
@@ -237,62 +182,6 @@ class Neovim(Editor):
             print(' '.join(cmd))
             print(env)
         os.execve(self.realdeditor, cmd, env)
-
-
-class NeovimQt(Neovim):
-    cmd = 'nvim-qt'
-    cli = False
-
-
-class Kak(Editor):
-    cmd = 'kak'
-    cli = True
-
-    def __init__(self, vmux):
-        self._session_dir = None
-        Editor.__init__(self, vmux)
-        if not os.path.exists(self.session_dir):
-            os.makedirs(self.session_dir)
-
-    def open(self, args):
-        if args[0] == '--':
-            args.pop(0)
-        if args:
-            return subprocess.call(
-                [self.realdeditor, '-c',
-                 self._vmux.session.upper()] + args)
-
-    def new(self, args, new_session=True):
-        cmd = [self.realdeditor]
-        if new_session:
-            self._vmux.new_session(self.cli)
-            cmd += ['-s', self._vmux.session]
-        os.execvp(self.realdeditor, cmd + args)
-
-    @property
-    def session_dir(self):
-        if not self._session_dir:
-            self._session_dir = os.path.expandvars(
-                os.path.expanduser(
-                    os.environ.get('VMUX_KAK_SESSION_DIR',
-                                   os.path.join(
-                                       os.environ.get('HOME'), '.cache', 'tmp',
-                                       'kakoune_sessions'))))
-        return self._session_dir
-
-    @property
-    def session_exists(self):
-        if not self._vmux.session_exists:
-            return False
-        return os.path.exists(self.session_address)
-
-    @property
-    def session_address(self):
-        return os.path.join(self.session_dir, self._vmux.session)
-
-    def destroy_session(self):
-        if os.path.exists(self.session_address):
-            os.remove(self.session_address)
 
 
 class Vmux(object):
@@ -431,7 +320,7 @@ def main():
     except ValueError:
         # ignore error, just start the default editor without any session
         pass
-    editors = [Neovim(v), Vim(v), NeovimQt(v), Gvim(v), Kak(v)]
+    editors = [Neovim(v)]
     editor_with_session = None
     default_editor = Editor.get_default_editor(editors)
     if not default_editor:
